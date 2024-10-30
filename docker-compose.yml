@@ -1,0 +1,23 @@
+services:
+  app:
+    container_name: suryadt_api
+    build:
+      platforms:
+        - "linux/amd64"
+      context: .
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: /bin/sh -c "/wait && npm run start:dev"
+    ports:
+      - 5000:5000
+    stdin_open: true
+    tty: true
+    env_file: .env
+    restart: always
+  
+  mongodb:
+    image: mongo:latest
+    container_name: suryadt_mongodb
+
+  

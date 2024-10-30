@@ -23,18 +23,26 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
+Node.js backend api for user birthday email notification build with [Nest](https://github.com/nestjs/nest) framework using TypeScript.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This API do is send a happy birthday message to users on their birthday at exactly 9 am on their local time. For example, if one user is in New York and the second user is in Melbourne, they should be getting a birthday message in their own time zone. 
 
-## Installation
-
+Todo that we need to setup a cron job with every 30 minutes to hit endpoint `/user/birthday`, ex:
 ```bash
-$ npm install
+$ curl --location 'http://localhost:5000/user/birthday'
 ```
 
-## Running the app
+Here's an example of crontab command:
+```sh
+*/30 * * * * curl --location 'http://localhost:5000/user/birthday'
+```
+
+## Running the app natively
 
 ```bash
+# installation
+$ npm install
+
 # development
 $ npm run start
 
@@ -43,6 +51,15 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+```
+
+## Running the app in docker environment
+```bash
+# build image
+$ docker compose build app
+
+# up service
+$ docker compose up -d
 ```
 
 ## Test

@@ -50,7 +50,7 @@ export class UserService {
     const results = await this.userModel
       .aggregate(pipeline, { sort: { birth_date: -1 } })
       .exec();
-    const deliveredIds = [];
+    const data = [];
     for (const result of results) {
       try {
         // send email notification to each users
@@ -59,24 +59,20 @@ export class UserService {
           result.first_name,
         );
 
-        // save which user id already receive email
-        deliveredIds.push(result._id);
+        // update user.year_celebrated to current years
+        // year_celebrated is flag to tell years of the users are already received the email
+        const updated = await this.userModel.findOneAndUpdate(
+          { _id: result._id },
+          { $set: { year_celebrated: moment().year() } },
+          { new: true },
+        );
+        data.push(updated);
       } catch (error) {
         console.error(error);
       }
     }
-    // update user.year_celebrated to current years
-    // year_celebrated is flag to tell years of the users are already received the email
-    await this.userModel.updateMany(
-      {
-        _id: { $in: deliveredIds },
-      },
-      {
-        $set: { year_celebrated: moment().year() },
-      },
-    );
 
-    return results;
+    return { status: 'success', data };
   }
 
   async create(payload: UserDto) {
@@ -98,9 +94,9 @@ export class UserService {
           new: true,
         },
       );
-      return user;
+      return { status: 'success', data: user };
     } else {
-      throw new Error('Your timezone is invalid.');
+      return { status: 'error', message: 'Your timezone is invalid.' };
     }
   }
 
@@ -136,9 +132,9 @@ export class UserService {
           new: true,
         },
       );
-      return user;
+      return { status: 'success', data: user };
     } else {
-      throw new Error('Your timezone is invalid.');
+      return { status: 'error', message: 'Your timezone is invalid.' };
     }
   }
 
@@ -147,7 +143,7 @@ export class UserService {
       email,
     });
 
-    return deleted;
+    return { status: 'success', data: deleted };
   }
 
   validateZone(zone): boolean {

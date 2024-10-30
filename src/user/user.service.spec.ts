@@ -21,21 +21,24 @@ describe('UserService', () => {
   };
   let mongod: MongoMemoryServer = null;
   const mockUserService = {
-    create: jest
-      .fn()
-      .mockReturnValue({ _id: new Types.ObjectId(), ...userPayload }),
-    delete: jest
-      .fn()
-      .mockReturnValue({ _id: new Types.ObjectId(), ...userPayload }),
-    update: jest
-      .fn()
-      .mockReturnValue({ _id: new Types.ObjectId(), ...userPayload }),
+    create: jest.fn().mockReturnValue({
+      status: 'success',
+      data: { _id: new Types.ObjectId(), ...userPayload },
+    }),
+    delete: jest.fn().mockReturnValue({
+      status: 'success',
+      data: { _id: new Types.ObjectId(), ...userPayload },
+    }),
+    update: jest.fn().mockReturnValue({
+      status: 'success',
+      data: { _id: new Types.ObjectId(), ...userPayload },
+    }),
   };
 
   beforeAll(async () => {
     // This will create an new instance of "MongoMemoryServer" and automatically start it
     mongod = await MongoMemoryServer.create();
-
+    jest.spyOn(console, 'warn');
     const uri = mongod.getUri();
     const module: TestingModule = await Test.createTestingModule({
       imports: [
@@ -83,24 +86,24 @@ describe('UserService', () => {
     const result = await service.create(userPayload);
     expect(service.create).toHaveBeenCalledTimes(1);
     expect(service.create).toHaveBeenCalledWith(userPayload);
-    expect(result).toHaveProperty('_id');
-    expect(result).toHaveProperty('email');
-    expect(result.email).toEqual(userPayload.email);
+    expect(result?.data).toHaveProperty('_id');
+    expect(result?.data).toHaveProperty('email');
+    expect(result?.data?.email).toEqual(userPayload.email);
   });
 
   it('should update user data', async () => {
     const result = await service.update(userPayload);
     expect(service.update).toHaveBeenCalledTimes(1);
     expect(service.update).toHaveBeenCalledWith(userPayload);
-    expect(result).toHaveProperty('_id');
-    expect(result).toHaveProperty('email');
-    expect(result.email).toEqual(userPayload.email);
+    expect(result?.data).toHaveProperty('_id');
+    expect(result?.data).toHaveProperty('email');
+    expect(result?.data.email).toEqual(userPayload.email);
   });
 
   it('should delete user data', async () => {
     const result = await service.delete(userPayload.email);
     expect(service.delete).toHaveBeenCalledTimes(1);
     expect(service.delete).toHaveBeenCalledWith(userPayload.email);
-    expect(result['email']).toEqual(userPayload.email);
+    expect(result.data['email']).toEqual(userPayload.email);
   });
 });
